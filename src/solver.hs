@@ -1,6 +1,18 @@
 import System.IO
 import Data.List
 
+-- zwraca ( (x, y), orientacja )
+find_word :: String -> [ [ Char ] ] -> ( (Int, Int), Int )
+
+get_removed_list :: String -> Int -> [ [ Char ] ] -> [ [ Char ] ]
+
+get_all_unused_letters :: [ [ Char ] ] -> [ String ] -> [ [ Char ] ]
+get_all_unused_letters letters words = get_unused_letters_impl letters words letters
+
+get_unused_letters_impl :: [ [ Char ] ] -> [ String ] -> [ [ Char ] ]
+get_unused_letters_impl all_letters (word:words) = get_removed_list (find_word word all_letters) (len word) (get_unused_letters_impl all_letters words)
+get_unused_letters_impl all_letters [] = all_letters
+
 --data Coords = Coords {rowVal::Int, columnVal::Int, count::Char} deriving (Show, Read)
 --plansza = [Coords]
 --plansza2 = [((Int, Int), Char)]
