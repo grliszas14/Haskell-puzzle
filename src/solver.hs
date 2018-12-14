@@ -20,6 +20,7 @@ get_unused_letters_impl all_letters [] = all_letters
 
 
 
+-- checkWords :: [ [ Char ] ] -> [ String ] -> [ Int ]
 checkWords [] [] = []
 checkWords planszaTab slowaTab = do
     let xC = 0
