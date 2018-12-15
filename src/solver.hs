@@ -32,8 +32,8 @@ is_word_in_place all_letters x y word
 
 get_next :: [ [ Char ] ] -> (Int, Int) -> (Int, Int)
 get_next all_letters (x, y)
-    | x < (length all_letters) = ((x+1), y)
-	| y < (length all_letters) = (0, (y+1))
+    | (x+1) < (length all_letters) = ((x+1), y)
+    | (y+1) < (length all_letters) = (0, (y+1))
     | otherwise  = (-1, -1)
 
 
