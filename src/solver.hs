@@ -5,13 +5,13 @@ import Data.List
 data Orientation = Vert | Hori | Diag | None deriving (Enum, Eq, Show)
 
 get_horizontal_list::[[Char]]->Int->Int->[(Int, Int)]
-get_horizontal_list all_letters x y = if (x < (length all_letters)) then (x,y):(get_horizontal_list all_letters (x+1) y) else []
+get_horizontal_list all_letters x y = if (x < (length (head all_letters))) then (x,y):(get_horizontal_list all_letters (x+1) y) else []
 
 get_vertical_list::[[Char]]->Int->Int->[(Int, Int)]
 get_vertical_list all_letters x y = if (y < (length all_letters)) then (x,y):(get_vertical_list all_letters x (y+1)) else []
 
 get_diagonal_list::[[Char]]->Int->Int->[(Int, Int)]
-get_diagonal_list all_letters x y = if (x < (length all_letters)) then (x,y):(get_diagonal_list all_letters (x+1) (y+1)) else []
+get_diagonal_list all_letters x y = if ( y < (length all_letters) && x < (length (head all_letters)) ) then (x,y):(get_diagonal_list all_letters (x+1) (y+1)) else []
 
 get_word_from_list::[[Char]]->[(Int, Int)]->[Char]
 get_word_from_list all_letters ((x, y):coords) = (all_letters !! y !! x ):(get_word_from_list all_letters coords)
@@ -32,7 +32,7 @@ is_word_in_place all_letters x y word
 
 get_next :: [ [ Char ] ] -> (Int, Int) -> (Int, Int)
 get_next all_letters (x, y)
-    | (x+1) < (length all_letters) = ((x+1), y)
+    | (x+1) < (length (head all_letters)) = ((x+1), y)
     | (y+1) < (length all_letters) = (0, (y+1))
     | otherwise  = (-1, -1)
 
@@ -92,13 +92,18 @@ checkWords planszaTab slowaTab = do
 main = do
     putStrLn "Plansza:"
     --planszaPath <- getLine
-    handlePlansza <- openFile ("../plikiTestowe/" ++ "lam1_plansza.txt") ReadMode
+    handleBoard <- openFile ("../plikiTestowe/" ++ "lam1_plansza.txt") ReadMode
     putStrLn "Slowa:"
     --slowaPath <- getLine
-    handleSlowa <- openFile ("../plikiTestowe/" ++ "lam1_slowa.txt") ReadMode
-    handledPlansza <- hGetContents handlePlansza
-    handledSlowa <- hGetContents handleSlowa
-    let tabPlansza = lines handledPlansza
-    let tabSlowa = lines handledSlowa
-    let chW = checkWords tabPlansza tabSlowa
-    return (get_all_unused_letters tabPlansza tabSlowa)
+    handleWords <- openFile ("../plikiTestowe/" ++ "lam1_slowa.txt") ReadMode
+    handledBoard <- hGetContents handleBoard
+    handledWords <- hGetContents handleWords
+    let tabBoard = lines handledBoard
+    let tabWords = lines handledWords
+    let tabPlanszaRozwiazana = get_unused_letters_impl ["CZAREK", "MICHAL", "GRZESI"] ["YY", "CM", "CI"]
+
+    putStrLn "Plansza początkowa:"
+    putStrLn handledBoard
+    putStrLn "\n"
+
+    return (tabBoard, tabWords, tabPlanszaRozwiazana)
