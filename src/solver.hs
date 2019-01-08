@@ -76,23 +76,9 @@ get_unused_letters_impl :: [ [ Char ] ] -> [ String ] -> [ [ Char ] ]
 get_unused_letters_impl all_letters [] = all_letters
 get_unused_letters_impl all_letters (word:words) = (get_removed_from_list (get_unused_letters_impl all_letters words) 0 ( orientation_to_list (find_word word all_letters (0, 0)) (length word) )  )
 
---data Coords = Coords {rowVal::Int, columnVal::Int, count::Char} deriving (Show, Read)
---plansza = [Coords]
---plansza2 = [((Int, Int), Char)]
+boardToString [] = []
+boardToString (line:rest) = (line++"\n"++boardToString rest)
 
-
-
-
--- checkWords :: [ [ Char ] ] -> [ String ] -> [ Int ]
-checkWords [] [] = []
-checkWords planszaTab slowaTab = do
-    let xC = 0
-    let yC = 0
-    let letter = slowaTab !! xC !! yC
-    let row = 0
-    let planszaRowsNum = length planszaTab
-    let foundIndexes = [elemIndices letter (planszaTab !! row) | row <- [0..planszaRowsNum-1]]
-    return foundIndexes
 
 main = do
     putStrLn "Plansza:"
@@ -105,10 +91,11 @@ main = do
     handledWords <- hGetContents handleWords
     let tabBoard = lines handledBoard
     let tabWords = lines handledWords
-    let tabPlanszaRozwiazana = get_unused_letters_impl ["CZAREK", "MICHAL", "GRZESI"] ["YY", "CM", "CI"]
-
+    let tabPlanszaRozwiazana = get_unused_letters_impl tabBoard tabWords
+    putStrLn "\n"
     putStrLn "Plansza początkowa:"
     putStrLn handledBoard
     putStrLn "\n"
-
-    return (tabBoard, tabWords, tabPlanszaRozwiazana)
+    putStrLn "Plansza po rozwiązaniu:"
+    putStrLn (boardToString tabPlanszaRozwiazana)
+    return (handledBoard, tabWords, tabPlanszaRozwiazana)
