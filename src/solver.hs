@@ -86,12 +86,18 @@ boardToString (line:rest) = (line++"\n"++boardToString rest)
 
 
 main = do
-    putStrLn "Plansza:"
-    --planszaPath <- getLine
-    handleBoard <- openFile ("../plikiTestowe/" ++ "lam3_plansza.txt") ReadMode
-    putStrLn "Slowa:"
-    --slowaPath <- getLine
-    handleWords <- openFile ("../plikiTestowe/" ++ "lam3_slowa.txt") ReadMode
+    putStrLn "Wybierz numer lamiglowki:"
+    nr <- getLine
+    let planszaPath | nr == "1" = "lam1_plansza.txt"
+                    | nr == "2" = "lam2_plansza.txt"
+                    | nr == "3" = "lam3_plansza.txt"
+                    | otherwise = error "Nie ma takiej łamigłówki"
+    handleBoard <- openFile ("../plikiTestowe/" ++ planszaPath) ReadMode
+    let slowaPath   | nr == "1" = "lam1_slowa.txt"
+                    | nr == "2" = "lam2_slowa.txt"
+                    | nr == "3" = "lam3_slowa.txt"
+                    | otherwise = error "Nie ma takiej łamigłówki"
+    handleWords <- openFile ("../plikiTestowe/" ++ slowaPath) ReadMode
     handledBoard <- hGetContents handleBoard
     handledWords <- hGetContents handleWords
     let tabBoard = lines handledBoard
