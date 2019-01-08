@@ -101,4 +101,4 @@ main = do
     let tabPlansza = lines handledPlansza
     let tabSlowa = lines handledSlowa
     let chW = checkWords tabPlansza tabSlowa
-    return (tabPlansza, tabSlowa, chW)
+    return (get_all_unused_letters tabPlansza tabSlowa)
