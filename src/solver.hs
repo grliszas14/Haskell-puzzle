@@ -2,7 +2,7 @@ import System.IO
 import Data.List
 
 
-data Orientation = Vert | Hori | Diag | None deriving (Enum, Eq, Show)
+data Orientation = Vert | Hori | Diag | Updi | None deriving (Enum, Eq, Show)
 
 get_horizontal_list::[[Char]]->Int->Int->[(Int, Int)]
 get_horizontal_list all_letters x y = if (x < (length (head all_letters))) then (x,y):(get_horizontal_list all_letters (x+1) y) else []
@@ -12,6 +12,9 @@ get_vertical_list all_letters x y = if (y < (length all_letters)) then (x,y):(ge
 
 get_diagonal_list::[[Char]]->Int->Int->[(Int, Int)]
 get_diagonal_list all_letters x y = if ( y < (length all_letters) && x < (length (head all_letters)) ) then (x,y):(get_diagonal_list all_letters (x+1) (y+1)) else []
+
+get_up_list::[[Char]]->Int->Int->[(Int, Int)]
+get_up_list all_letters x y = if ( y >= 0 && x < (length (head all_letters)) ) then (x,y):(get_up_list all_letters (x+1) (y-1)) else []
 
 get_word_from_list::[[Char]]->[(Int, Int)]->[Char]
 get_word_from_list all_letters ((x, y):coords) = (all_letters !! y !! x ):(get_word_from_list all_letters coords)
@@ -28,6 +31,7 @@ is_word_in_place all_letters x y word
     | begins_with word ( get_word_from_list all_letters (get_horizontal_list all_letters x y ) ) = Hori
     | begins_with word ( get_word_from_list all_letters (get_vertical_list all_letters x y) ) = Vert
     | begins_with word ( get_word_from_list all_letters (get_diagonal_list all_letters x y) ) = Diag
+    | begins_with word ( get_word_from_list all_letters (get_up_list all_letters x y) ) = Updi
     | otherwise = None
 
 get_next :: [ [ Char ] ] -> (Int, Int) -> (Int, Int)
@@ -50,6 +54,7 @@ orientation_to_list ( (x, y),orien ) len
   | orien == Hori = ( (x, y):(orientation_to_list ( ((x+1), y), Hori) (len-1) ) )
   | orien == Vert = ( (x, y):(orientation_to_list ( (x, (y+1)), Vert) (len-1) ) )
   | orien == Diag = ( (x, y):(orientation_to_list ( ((x+1), (y+1)), Diag) (len-1) ) )
+  | orien == Updi = ( (x, y):(orientation_to_list ( ((x+1), (y-1)), Updi) (len-1) ) )
   | otherwise = []
 
 is_in_list :: (Int, Int) -> [ (Int, Int) ] -> Bool
