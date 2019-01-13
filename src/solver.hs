@@ -22,30 +22,30 @@ begins_with [] _ = True
 begins_with _ [] = False
 
 
-is_word_in_place :: [ [ Char ] ] -> Int -> Int -> [ Char ] -> Orientation
-is_word_in_place all_letters x y word
-    | begins_with word ( get_horizontal_list all_letters x y ) = Hori
-    | begins_with word ( get_vertical_list all_letters x y) = Vert
-    | begins_with word ( get_diagonal_list all_letters x y) = Diag
-    | begins_with word ( get_up_list all_letters x y) = Updi
-    | otherwise = None
+is_word_in_place :: [ [ Char ] ] -> Int -> Int -> [ Char ] -> Orientation -> Bool
+is_word_in_place all_letters x y word orien
+  | orien == Hori = begins_with word ( get_horizontal_list all_letters x y )
+  | orien == Vert = begins_with word ( get_vertical_list all_letters x y)
+  | orien == Diag = begins_with word ( get_diagonal_list all_letters x y)
+  | orien == Updi = begins_with word ( get_up_list all_letters x y)
+  | otherwise = False
 
-get_next :: [ [ Char ] ] -> (Int, Int) -> (Int, Int)
-get_next all_letters (x, y)
-    | (x+1) < (length (head all_letters)) = ((x+1), y)
-    | (y+1) < (length all_letters) = (0, (y+1))
-    | otherwise  = (-1, -1)
+get_next :: [ [ Char ] ] -> (Int, Int) -> Orientation -> ((Int, Int), Orientation)
+get_next all_letters (x, y) orien
+  | orien == Hori = ((x, y), Vert)
+  | orien == Vert = ((x, y), Diag)
+  | orien == Diag = ((x, y), Updi)
+  | (x+1) < (length (head all_letters)) = (((x+1), y), Hori)
+  | (y+1) < (length all_letters) = ((0, (y+1)), Hori)
+  | otherwise  = ((-1, -1), None)
 
 
-find_words :: String -> [ [ Char ] ] -> (Int, Int) -> [ ( (Int, Int), Orientation ) ]
-find_words word all_letters (x, y) = if ((find_word word all_letters (x, y)) == ( (-1, -1), None )) then [] else ((find_word word all_letters (x, y)):(find_words word all_letters (get_next all_letters (x, y))))
+find_words :: String -> [ [ Char ] ] -> ((Int, Int), Orientation) -> [ ( (Int, Int), Orientation ) ]
+find_words word all_letters ((x, y), orien) = if (found_word == ( (-1, -1), None)) then [] else (found_word:(find_words word all_letters (get_next all_letters (x, y) orien))) where found_word = (find_word word all_letters ((x, y), orien))
 
-find_word :: String -> [ [ Char ] ] -> (Int, Int)-> ( (Int, Int), Orientation )
-find_word _ _ (-1, -1) = ( (-1, -1), None )
-find_word word all_letters (x, y)
-  | orien == None = (find_word word all_letters (get_next all_letters (x, y)))
-  | otherwise = ( (x, y), orien )
-  where orien = (is_word_in_place all_letters x y word)
+find_word :: String -> [ [ Char ] ] -> ((Int, Int), Orientation)-> ( (Int, Int), Orientation )
+find_word _ _ ((-1, -1), None) = ( (-1, -1), None )
+find_word word all_letters ((x, y), orien) = if (is_word_in_place all_letters x y word orien) then ( (x, y), orien ) else (find_word word all_letters (get_next all_letters (x, y) orien))
 
 get_n_elems :: [t] -> Int -> [t]
 get_n_elems _ 0 = []
@@ -85,7 +85,7 @@ get_all_unused_letters letters words = (get_unused_letters_impl letters words)
 
 get_unused_letters_impl :: [ [ Char ] ] -> [ String ] -> [ [ Char ] ]
 get_unused_letters_impl all_letters [] = all_letters
-get_unused_letters_impl all_letters (word:words) = (get_removed_from_lists (get_unused_letters_impl all_letters words) ( orientations_to_lists (find_words word all_letters (0, 0)) (length word) )  )
+get_unused_letters_impl all_letters (word:words) = (get_removed_from_lists (get_unused_letters_impl all_letters words) ( orientations_to_lists (find_words word all_letters ((0, 0), Hori)) (length word) )  )
 
 boardToString [] = []
 boardToString (line:rest) = (line++"\n"++boardToString rest)
