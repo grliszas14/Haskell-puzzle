@@ -45,12 +45,20 @@ get_next all_letters (x, y)
     | otherwise  = (-1, -1)
 
 
+find_words :: String -> [ [ Char ] ] -> (Int, Int) -> [ ( (Int, Int), Orientation ) ]
+find_words word all_letters (x, y) = if ((find_word word all_letters (x, y)) == ( (-1, -1), None )) then [] else ((find_word word all_letters (x, y)):(find_words word all_letters (get_next all_letters (x, y))))
+
 find_word :: String -> [ [ Char ] ] -> (Int, Int)-> ( (Int, Int), Orientation )
+find_word _ _ (-1, -1) = ( (-1, -1), None )
 find_word word all_letters (x, y) = if ((is_word_in_place all_letters x y word)==None) then (find_word word all_letters (get_next all_letters (x, y)) ) else ( (x, y), (is_word_in_place all_letters x y word))
 
 get_n_elems :: [t] -> Int -> [t]
 get_n_elems _ 0 = []
 get_n_elems (x:xs) a = (x:(get_n_elems xs (a-1)))
+
+orientations_to_lists :: [ ( (Int, Int), Orientation ) ] -> Int -> [ [ ( Int, Int) ] ]
+orientations_to_lists [] _ = []
+orientations_to_lists (orien:rest) len = ((orientation_to_list orien len):(orientations_to_lists rest len))
 
 orientation_to_list :: ( (Int, Int), Orientation ) -> Int -> [ (Int, Int) ]
 orientation_to_list _ 0 = []
@@ -70,6 +78,10 @@ get_star_from_single_list :: [ Char ] -> Int -> Int -> [ (Int, Int) ] -> [ Char 
 get_star_from_single_list (letter:rest) x y used_list = if (is_in_list (x, y) used_list) then ('*':(get_star_from_single_list rest (x+1) y used_list)) else (letter:(get_star_from_single_list rest (x+1) y used_list))
 get_star_from_single_list [] _ _ _ = []
 
+get_removed_from_lists :: [ [ Char ] ] -> [ [ (Int, Int) ] ] -> [ [ Char ] ]
+get_removed_from_lists all_letters [] = all_letters
+get_removed_from_lists all_letters (coord:rest) = (get_removed_from_list (get_removed_from_lists all_letters rest) 0 coord)
+
 get_removed_from_list :: [ [ Char ] ] -> Int -> [ (Int, Int) ] -> [ [ Char ] ]
 get_removed_from_list (first:rest) y used_list = ((get_star_from_single_list first 0 y used_list):(get_removed_from_list rest (y+1) used_list))
 get_removed_from_list [] _ _ = []
@@ -79,7 +91,7 @@ get_all_unused_letters letters words = (get_unused_letters_impl letters words)
 
 get_unused_letters_impl :: [ [ Char ] ] -> [ String ] -> [ [ Char ] ]
 get_unused_letters_impl all_letters [] = all_letters
-get_unused_letters_impl all_letters (word:words) = (get_removed_from_list (get_unused_letters_impl all_letters words) 0 ( orientation_to_list (find_word word all_letters (0, 0)) (length word) )  )
+get_unused_letters_impl all_letters (word:words) = (get_removed_from_lists (get_unused_letters_impl all_letters words) ( orientations_to_lists (find_words word all_letters (0, 0)) (length word) )  )
 
 boardToString [] = []
 boardToString (line:rest) = (line++"\n"++boardToString rest)
